@@ -27,6 +27,8 @@ public interface Chain {
 
     AccountInfo getAccount(String accountName) throws ChainException;
 
+    public List<String> getCurrencyBalance(String account,String code,String symbol) throws ChainException;
+
 	Transaction createCreateAccountTransaction(String creator, String accountName, String ownerKey, String activeKey) throws ChainException;
 
 	Transaction createSetProducersTransaction(String creator, Set<ProducerInfo> producers) throws ChainException;

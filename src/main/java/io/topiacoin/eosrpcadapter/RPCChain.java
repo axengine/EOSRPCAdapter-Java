@@ -84,6 +84,42 @@ public class RPCChain implements Chain {
     }
 
     @Override
+    public List<String> getCurrencyBalance(String account,String code,String symbol) throws ChainException {
+        List<String> getCurrencyBalanceResponse= new ArrayList<>();
+
+        try {
+            URL getInfoURL = new URL(chainURL, "/v1/chain/get_currency_balance"+"?symbol=EOS&account="+account);
+
+
+            Map<String, String> requestMap = new HashMap<String, String>();
+            requestMap.put("code", code);
+            requestMap.put("account", account);
+            requestMap.put("symbol", symbol);
+
+            String requestString = _objectMapper.writeValueAsString(requestMap);
+
+            EOSRPCAdapter.EOSRPCResponse response = rpcAdapter.postRequest(getInfoURL,requestString);
+
+            _log.debug("Get getCurrencyBalance Response: " + response);
+
+            if (response.response != null) {
+                getCurrencyBalanceResponse = _objectMapper.readValue(response.response, List.class);
+            } else {
+                ErrorResponse errorResponse = _objectMapper.readValue(response.error.getEntity().getContent(), ErrorResponse.class);
+                throw new ChainException(errorResponse.message, errorResponse);
+            }
+        } catch (MalformedURLException e) {
+            throw new ChainException(e, null);
+        } catch (IOException e) {
+            throw new ChainException(e, null);
+        } catch (EOSException e) {
+            throw new ChainException(e, null);
+        }
+
+        return getCurrencyBalanceResponse;
+    }
+
+    @Override
     public BlockInfo getBlock(String blockNumOrID) throws ChainException {
         BlockInfo getBlockResponse = null;
 
